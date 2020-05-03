@@ -1,0 +1,54 @@
+@import './_variables.scss';
+@import './_mixins.scss';
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', Arial, Helvetica, sans-serif;
+    font-weight: 300;
+}
+
+img {
+    max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+    margin: 0;
+    padding: 0;
+    font-weight: 400;
+    font-family: 'Playfair Display', Arial, Helvetica, serif;
+}
+
+h1 {
+    font-size: 38px;
+
+    @include screen(sm) {
+        font-size: 68px;
+    }
+}
+
+h2 {
+    font-size: 24px;
+}
+
+h3 {
+    font-size: 20px;
+}
+
+p {
+    font-size: 14px;
+}
+
+a {
+    font-family: 'Playfair Display', Arial, Helvetica, serif;
+    font-weight: 400;
+    font-size: 14px;
+    color: $black;
+    text-decoration: none;
+}

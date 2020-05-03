@@ -1,0 +1,120 @@
+/**
+  * Responsive breakpoint mixin.
+  * Parameter class can be : xs, sm, md, lg, xl
+  */
+
+@mixin screen($class) {
+    @if $class == xs {
+        @media screen and (min-width: $xs) {
+            @content;
+        }
+    }
+
+    @else if $class == sm {
+        @media screen and (min-width: $sm) {
+            @content;
+        }
+    }
+
+    @else if $class == md {
+        @media screen and (min-width: $md) {
+            @content;
+        }
+    }
+
+    @else if $class == lg {
+        @media screen and (min-width: $lg) {
+            @content;
+        }
+    }
+
+    @else if $class == xl {
+        @media screen and (min-width: $xl) {
+            @content;
+        }
+    }
+
+    @else {
+        @warn "Breakpoint mixin supports: xs, sm, md, lg";
+    }
+}
+
+/**
+  * Browser polyfill mixin
+  * Parameter class can be : ff, safari, ie, edge
+  */
+
+@mixin browser($class) {
+    // Firefox
+    @if $class == ff {
+        @supports (-moz-appearance: none) {
+            @content;
+        }
+    }
+
+    // Safari 9+
+    @else if $class == safari {
+        @media not all and (min-resolution: 0.001dpcm) {
+            @supports (-webkit-appearance: none) {
+                @content;
+            }
+        }
+    }
+
+    // IE10+
+    @else if $class == ie {
+        @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+            @content;
+        }
+    }
+
+    // MS Edge
+    @else if $class == edge {
+        @supports (-ms-accelerator: true) {
+            @content;
+        }
+    }
+
+    @else {
+        @warn "Browser mixin supports: ff, safari, ie, edge";
+    }
+}
+
+/**
+  * Bulletproof font-face
+  */
+
+@mixin font-face($family, $file, $weight, $style) {
+    @font-face {
+        font-family: $family;
+        src: url("//fonts/" + $file + ".eot");
+        src:
+            url("//fonts/" + $file + ".eot#iefix") format("embedded-opentype"),
+            url("//fonts/" + $file + ".woff") format("woff"),
+            url("//fonts/" + $file + ".ttf") format("truetype"),
+            url("//fonts/" + $file + ".svg#" + $file) format("svg");
+        font: {
+            style: $style;
+            weight: $weight;
+        }
+    }
+}
+
+/**
+  * Multiple animation assignment
+  */
+
+@mixin animation($animate...) {
+    $max: length($animate);
+    $animations: "";
+
+    @for $i from 1 through $max {
+        $animations: #{$animations + nth($animate, $i)};
+
+        @if $i < $max {
+            $animations: #{$animations + ", "};
+        }
+    }
+
+    animation: $animations;
+}

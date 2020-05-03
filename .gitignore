@@ -1,0 +1,14 @@
+node_modules/
+.DS_Store
+.cache/
+dist/
+coverage/
+.vscode/
+.env
+FSPS.code-workspace
+public/
+functions/
+src/firebase.js
+.firebase/
+firestore.rules
+database.rules.json
