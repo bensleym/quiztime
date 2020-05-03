@@ -2,17 +2,12 @@
     <div>
         <div class="player">
             <div class="player__name">
-                <h1 v-if="BASE_playerName" class="player__title">
-                    {{ BASE_playerName }}
-                </h1>
+                <h1 v-if="BASE_playerName" class="player__title">{{ BASE_playerName }}</h1>
                 <TeamInPlay />
             </div>
             <div class="player__top"></div>
 
-            <div
-                class="player__bottom"
-                :class="BASE_inplay === true ? 'player__bottom--inplay' : ''"
-            ></div>
+            <div class="player__bottom" :class="activeClass"></div>
 
             <div class="player__content">
                 <PlayerName v-if="!BASE_playerName" />
@@ -41,11 +36,22 @@ export default {
         TeamInPlay
     },
     computed: {
-        ...mapGetters(['BASE_playerName', 'BASE_inplay'])
+        ...mapGetters(['BASE_playerName', 'BASE_inplay']),
+
+        activeClass() {
+            if (this.BASE_inplay && this.isCorrect.length === 0) {
+                return 'player__bottom--inplay';
+            } else if (this.BASE_inplay && this.isCorrect === 'true')
+                return 'player__bottom--inplay correct';
+            else if (this.BASE_inplay && this.isCorrect === 'false') {
+                return 'player__bottom--inplay incorrect';
+            }
+        }
     },
     data() {
         return {
-            resetActive: false
+            resetActive: false,
+            isCorrect: ''
         };
     },
     created() {
@@ -54,6 +60,13 @@ export default {
             .doc('reset')
             .onSnapshot(doc => {
                 this.resetActive = doc.data().resetActive;
+            });
+
+        firestore
+            .collection('answerBoolean')
+            .doc('answer')
+            .onSnapshot(doc => {
+                this.isCorrect = doc.data().correct;
             });
     }
 };
@@ -94,7 +107,7 @@ export default {
         bottom: -50%;
         background: $deep-blue;
         z-index: 10;
-        transition: bottom 0.5s linear;
+        transition: all 0.5s linear;
 
         &--inplay {
             bottom: 0;
@@ -118,5 +131,13 @@ export default {
     &__title {
         color: $white;
     }
+}
+
+.correct {
+    background: $lima;
+}
+
+.incorrect {
+    background: $monza;
 }
 </style>
