@@ -10,11 +10,17 @@ const ls = new SecureLS({ isCompression: false });
 const store = new Vuex.Store({
     state: {
         playerName: '',
-        inplay: ''
+        inplay: '',
+        lightingActive: false,
+        lighting: {
+            name: '',
+            state: { on: '', sat: '', bri: '', hue: '' }
+        }
     },
     getters: {
         BASE_playerName: state => state.playerName,
-        BASE_inplay: state => state.inplay
+        BASE_inplay: state => state.inplay,
+        BASE_ligthingActive: state => state.lightingActive
     },
     mutations: {
         MUTATE_PLAYER_NAME(state, value) {
@@ -22,6 +28,9 @@ const store = new Vuex.Store({
         },
         MUTATE_IN_PLAY(state, value) {
             state.inplay = value;
+        },
+        MUTATE_LIGHTING_ACTIVE(state, value) {
+            state.lightingActive = value;
         }
     },
     actions: {
@@ -30,6 +39,9 @@ const store = new Vuex.Store({
         },
         BASE_setInplay({ commit }, payload) {
             commit('MUTATE_IN_PLAY', payload);
+        },
+        BASE_setLightingActive({ commit }, payload) {
+            commit('MUTATE_LIGHTING_ACTIVE', payload);
         }
     },
     plugins: [

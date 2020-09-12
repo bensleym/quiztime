@@ -3,7 +3,6 @@
         <div class="homepage__header">
             <h1 class="homepage__header-title">Quiz time</h1>
         </div>
-
         <div class="homepage__content">
             <div class="homepage__content-item homepage__content-item--active-player">
                 <p>
@@ -49,6 +48,21 @@
                     <span v-else>Deactivate</span> clear data
                 </button>
             </div>
+
+            <div class="homepage__content-item">
+                <h2>Interactive lighting {{ BASE_ligthingActive ? 'Active' : 'Inactive'}}</h2>
+                <p>BETA... Currently only available on localhost. Philips Hue interactive lighting. Activate to sync Philips Hue ligting.</p>
+                <p>Status: {{lightsAvailable ? 'Available' : 'Unavailable'}}</p>
+                <button
+                    class="btn btn__primary"
+                    @click="activateLighting(BASE_ligthingActive)"
+                    :disabled="lightsAvailable !== true"
+                    :class="lightsAvailable !== true ? 'btn--disabled': ''"
+                >
+                    <span v-if="!BASE_ligthingActive">Activate</span>
+                    <span v-else>Deactivate</span> lighting
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -64,7 +78,20 @@ export default {
     components: {
         RefreshCcwIcon
     },
+    computed: {
+        ...mapGetters(['BASE_ligthingActive'])
+    },
     created() {
+        this.$api
+            .get('lights/1')
+            .then(response => {
+                if (response) {
+                    this.lightsAvailable = true;
+                }
+            })
+            .catch(error => {
+                return Promise.reject(error.response);
+            });
         firestore
             .collection('resetData')
             .doc('reset')
@@ -91,18 +118,24 @@ export default {
             resetActive: false,
             activePlayer: '',
             isCorrect: '',
-            isLoading: false
+            isLoading: false,
+            lightsAvailable: false
         };
     },
     methods: {
-        ...mapActions(['BASE_setInplay']),
+        ...mapActions(['BASE_setInplay', 'BASE_setLightingActive']),
 
         resetBtns(event) {
             event.preventDefault();
-            this.resetlLading();
+            this.resetlLoading();
             const doc = 'activePlayer';
             setFirestore({ player: '' }, 'active', doc);
             setFirestore({ correct: '' }, 'answerBoolean', 'answer');
+            this.$api
+                .put('lights/1/state', { sat: 254, bri: 254, hue: 45535 })
+                .catch(error => {
+                    return Promise.reject(error.response);
+                });
             this.BASE_setInplay(false);
         },
         clearDataActivate(event, value) {
@@ -113,13 +146,48 @@ export default {
         answerValue(value) {
             const doc = 'answer';
             setFirestore({ correct: value }, 'answerBoolean', doc);
+            console.log(value);
+            if (this.BASE_ligthingActive) {
+                const lightColor =
+                    value === 'true'
+                        ? { sat: 254, bri: 254, hue: 24000 }
+                        : { sat: 254, bri: 254, hue: 100 };
+                console.log(lightColor, value);
+
+                this.$api.put('lights/1/state', lightColor).catch(error => {
+                    return Promise.reject(error.response);
+                });
+            }
         },
-        resetlLading() {
+        resetlLoading() {
             this.isLoading = true;
 
             setTimeout(() => {
                 this.isLoading = false;
             }, 1000);
+        },
+        getLights() {
+            this.$api.put('lights/1/state', { on: true }).catch(error => {
+                return Promise.reject(error.response);
+            });
+        },
+        activateLighting(value) {
+            this.BASE_setLightingActive(!value);
+
+            if (!value) {
+                this.getLights();
+            } else {
+                this.$api
+                    .put('lights/1/state', {
+                        on: false,
+                        sat: 254,
+                        bri: 254,
+                        hue: 45535
+                    })
+                    .catch(error => {
+                        return Promise.reject(error.response);
+                    });
+            }
         }
     }
 };
